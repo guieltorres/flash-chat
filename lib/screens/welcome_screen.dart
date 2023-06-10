@@ -25,9 +25,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                SizedBox(
-                  height: 80.0,
-                  child: Image.asset('images/logo.png'),
+                Hero(
+                  tag: 'logo',
+                  child: SizedBox(
+                    height: 80.0,
+                    child: Image.asset('images/logo.png'),
+                  ),
                 ),
                 const Text(
                   'Flash Chat',
@@ -56,6 +59,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: 42.0,
                   child: const Text(
                     'Log In',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -75,6 +79,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: 42.0,
                   child: const Text(
                     'Register',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
