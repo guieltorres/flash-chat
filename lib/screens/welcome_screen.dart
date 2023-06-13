@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'login_screen.dart';
@@ -42,7 +43,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
     controller.addListener(() {
       setState(() {});
-      print(animation.value);
+      if (kDebugMode) {
+        print(animation.value);
+      }
     });
 
     @override
