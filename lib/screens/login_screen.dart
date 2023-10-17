@@ -15,11 +15,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool showIndicator = false;
   final _auth = FirebaseAuth.instance;
   late String email;
   late String password;
 
   void login() async {
+    setState(() => showIndicator = true);
     try {
       final user = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -28,6 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       print(e);
+    } finally {
+      setState(() => showIndicator = false);
     }
   }
 

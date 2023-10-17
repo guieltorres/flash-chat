@@ -1,14 +1,18 @@
+import 'package:flash_chat_v2/components/CircularIndicator.dart';
 import 'package:flutter/material.dart';
 
 class RoundedButton extends StatelessWidget {
   final Color color;
   final String title;
   final void Function()? onPressed;
+  final bool isLoading;
 
-  RoundedButton({
+  const RoundedButton({
+    super.key,
     required this.color,
     required this.title,
     required this.onPressed,
+    this.isLoading = false,
   });
 
   @override
@@ -23,10 +27,12 @@ class RoundedButton extends StatelessWidget {
           onPressed: onPressed,
           minWidth: 200.0,
           height: 42.0,
-          child: Text(
-            title,
-            style: const TextStyle(color: Colors.white),
-          ),
+          child: isLoading
+              ? const CircularIndicator()
+              : Text(
+                  title,
+                  style: const TextStyle(color: Colors.white),
+                ),
         ),
       ),
     );

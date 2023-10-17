@@ -15,11 +15,13 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  bool showIndicator = false;
   final _auth = FirebaseAuth.instance;
   late String email;
   late String password;
 
   void register() async {
+    setState(() => showIndicator = true);
     try {
       final newUser = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -28,6 +30,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       }
     } catch (e) {
       print(e);
+    } finally {
+      setState(() => showIndicator = false);
     }
   }
 
@@ -93,6 +97,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     RoundedButton(
                       color: Colors.blueAccent,
                       title: 'Register',
+                      isLoading: showIndicator,
                       onPressed: () {
                         register();
                       },
