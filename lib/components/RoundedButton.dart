@@ -24,7 +24,7 @@ class RoundedButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(30.0),
         elevation: 5.0,
         child: MaterialButton(
-          onPressed: onPressed,
+          onPressed: isLoading ? null : onPressed,
           minWidth: 200.0,
           height: 42.0,
           child: isLoading
