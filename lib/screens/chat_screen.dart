@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat_v2/components/Alert.dart';
 import 'package:flash_chat_v2/components/CircularIndicator.dart';
 import 'package:flash_chat_v2/components/MessageBubble.dart';
 import 'package:flash_chat_v2/screens/welcome_screen.dart';
@@ -8,7 +9,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../constants.dart';
 
 final _firestore = FirebaseFirestore.instance;
+final _auth = FirebaseAuth.instance;
 late User loggedInUser;
+late bool hasError;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -21,7 +24,6 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
-  final _auth = FirebaseAuth.instance;
   late String messageText;
 
   @override
@@ -30,12 +32,11 @@ class _ChatScreenState extends State<ChatScreen> {
     getCurrentUser();
   }
 
-  void getCurrentUser() async {
+  void getCurrentUser() {
     try {
-      final user = await _auth.currentUser;
+      final user = _auth.currentUser;
       if (user != null) {
         loggedInUser = user;
-        print('User: ${loggedInUser.email}');
       }
     } catch (e) {
       print(e);
@@ -58,13 +59,21 @@ class _ChatScreenState extends State<ChatScreen> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           leading: null,
           actions: <Widget>[
             IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  logout();
-                }),
+              icon: const Icon(Icons.close),
+              onPressed: () => showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => const Alert(
+                  title: "Quick Check",
+                  description: "Ready to sign off?",
+                  approveText: "Log Out",
+                  denyText: "Not Yet",
+                ),
+              ),
+            ),
           ],
           title: const Text('⚡️Chat'),
           backgroundColor: Colors.lightBlueAccent,
@@ -75,37 +84,38 @@ class _ChatScreenState extends State<ChatScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const MessagesStream(),
-              Container(
-                decoration: kMessageContainerDecoration,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                        controller: messageTextController,
-                        onChanged: (value) {
-                          messageText = value;
+              if (hasError = false)
+                Container(
+                  decoration: kMessageContainerDecoration,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          controller: messageTextController,
+                          onChanged: (value) {
+                            messageText = value;
+                          },
+                          decoration: kMessageTextFieldDecoration,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          messageTextController.clear();
+                          _firestore.collection("messages").add({
+                            "text": messageText,
+                            "sender": loggedInUser.email,
+                            "timestamp": Timestamp.now(),
+                          });
                         },
-                        decoration: kMessageTextFieldDecoration,
+                        child: const Text(
+                          'Send',
+                          style: kSendButtonTextStyle,
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        messageTextController.clear();
-                        _firestore.collection("messages").add({
-                          "text": messageText,
-                          "sender": loggedInUser.email,
-                          "timestamp": Timestamp.now(),
-                        });
-                      },
-                      child: const Text(
-                        'Send',
-                        style: kSendButtonTextStyle,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -129,19 +139,30 @@ class MessagesStream extends StatelessWidget {
         print(document.data());
       }
     });
+
     return StreamBuilder<QuerySnapshot>(
       stream: stream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Text('Something went wrong');
+          hasError = true;
+          return const Expanded(
+            child: Center(
+              child: Text(
+                'Something went wrong 😭',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          );
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularIndicator();
-        }
-
-        if (snapshot.hasData == false) {
-          return const Text('Nothing to show yet.');
+          return const Expanded(
+            child: Center(
+              child: CircularIndicator(),
+            ),
+          );
         }
 
         return Expanded(
