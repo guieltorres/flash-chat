@@ -11,7 +11,7 @@ import '../constants.dart';
 final _firestore = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
 late User loggedInUser;
-late bool hasError;
+bool hasError = false;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -66,11 +66,12 @@ class _ChatScreenState extends State<ChatScreen> {
               icon: const Icon(Icons.close),
               onPressed: () => showDialog<String>(
                 context: context,
-                builder: (BuildContext context) => const Alert(
+                builder: (BuildContext context) => Alert(
                   title: "Quick Check",
                   description: "Ready to sign off?",
                   approveText: "Log Out",
                   denyText: "Not Yet",
+                  onPress: () => logout(),
                 ),
               ),
             ),
@@ -84,7 +85,7 @@ class _ChatScreenState extends State<ChatScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               const MessagesStream(),
-              if (hasError = false)
+              if (hasError == false)
                 Container(
                   decoration: kMessageContainerDecoration,
                   child: Row(
