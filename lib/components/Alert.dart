@@ -6,7 +6,6 @@ class Alert extends StatelessWidget {
   final String approveText;
   final String denyText;
   final VoidCallback? onPress;
-  final bool cancellable;
 
   const Alert({
     Key? key,
@@ -15,7 +14,6 @@ class Alert extends StatelessWidget {
     this.approveText = "OK",
     this.denyText = "Cancel",
     this.onPress,
-    this.cancellable = true,
   }) : super(key: key);
 
   @override
