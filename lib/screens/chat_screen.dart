@@ -11,7 +11,7 @@ import '../constants.dart';
 final _firestore = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
 late User loggedInUser;
-bool hasError = false;
+late bool hasError;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -30,6 +30,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     getCurrentUser();
+    hasError = false;
   }
 
   void getCurrentUser() {
